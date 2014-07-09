@@ -98,9 +98,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	HWND hWnd;
 
 	hInst = hInstance; // Store instance handle in our global variable
-
-	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME,
+		800, 30, 900, 600, NULL, NULL, hInstance, NULL);
 
 	if (!hWnd)
 	{
@@ -135,10 +134,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE: {
 						//MessageBox(NULL, _T("test"), _T("test"), MB_OK);
-						SetWindowPos(hWnd, HWND_TOP, 30, 30, 930, 630, NULL);
+						//SetWindowPos(hWnd, HWND_TOP, 30, 30, 900, 600, NULL);
 
 						HWND childHWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_MANE_PAGE), hWnd, MainPage);
-						SetWindowPos(childHWnd, HWND_TOP, 0, 0, 930, 600, NULL);
+						RECT wrect;
+						GetWindowRect(childHWnd, &wrect);
+						int height = wrect.bottom - wrect.top, width = wrect.right - wrect.left;
+						SetWindowPos(childHWnd, HWND_TOP, 900 / 2 - width / 2, 0, width, height, NULL);
 	}
 	case WM_COMMAND:
 		wmId = LOWORD(wParam);
@@ -164,6 +166,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+	
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
@@ -200,11 +203,15 @@ INT_PTR CALLBACK MainPage(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		return (INT_PTR)TRUE;
 
 	case WM_COMMAND:
-		if (LOWORD(wParam) == IDC_BUTTON_SECURE_FILES) {
+		switch (LOWORD(wParam)) {
+
+		case IDC_BUTTON_SECURE_FILES:
 			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
+			break;
+			
 		}
-		break;
+		return (INT_PTR)TRUE;
+		
 	}
 	return (INT_PTR)FALSE;
 }
